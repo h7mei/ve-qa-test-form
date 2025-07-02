@@ -279,6 +279,13 @@ export default function Page() {
     onStatusChange: (status: 'pass' | 'fail' | 'not-tested') => void
     onNotesChange: (notes: string) => void
   }) => {
+    // Keep textarea value locally so typing doesn't trigger a full page re-render on every keystroke.
+    const [localNotes, setLocalNotes] = React.useState(notes)
+    // If the parent pushes a different notes value (e.g. when resetting the form) sync it.
+    React.useEffect(() => {
+      setLocalNotes(notes)
+    }, [notes])
+
     const sanitizeId = (label: string) => label.replace(/\s+/g, '-').toLowerCase();
     // Uncomment for debug:
     // console.log('Rendering:', label);
@@ -288,13 +295,12 @@ export default function Page() {
           <Label className="text-sm font-medium text-gray-800" htmlFor={`${sanitizeId(label)}-notes`}>{label}</Label>
           <div className="flex gap-2 text-sm">
             <span
-              className={`px-2 py-1 rounded text-xs ${
-                status === "pass"
-                  ? "bg-green-100 text-green-800"
-                  : status === "fail"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-600"
-              }`}
+              className={`px-2 py-1 rounded text-xs ${status === "pass"
+                ? "bg-green-100 text-green-800"
+                : status === "fail"
+                  ? "bg-red-100 text-red-800"
+                  : "bg-gray-100 text-gray-600"
+                }`}
             >
               {getStatusSymbol(status)} {status.toUpperCase()}
             </span>
@@ -333,10 +339,16 @@ export default function Page() {
           id={`${sanitizeId(label)}-notes`}
           name={`${sanitizeId(label)}-notes`}
           placeholder="Notes..."
-          value={notes}
+          value={localNotes}
           onChange={(e) => {
+            setLocalNotes(e.target.value)
+          }}
+          // Propagate the value to the parent only when the user leaves the field.
+          onBlur={() => {
             handleFieldInteraction()
-            onNotesChange(e.target.value)
+            if (localNotes !== notes) {
+              onNotesChange(localNotes)
+            }
           }}
           className="text-xs h-16 resize-none"
           rows={2}
@@ -346,6 +358,34 @@ export default function Page() {
   }
 
   const MemoizedCompactTestItem = React.memo(CompactTestItem)
+
+  // Separate component so we can use hooks while keeping Leaderboard notes local.
+  const LeaderboardNotes: React.FC = () => {
+    const [localNotes, setLocalNotes] = React.useState(leaderboard.notes)
+
+    React.useEffect(() => {
+      setLocalNotes(leaderboard.notes)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [leaderboard.notes])
+
+    return (
+      <Textarea
+        id="leaderboard-notes"
+        name="leaderboard-notes"
+        placeholder="Notes..."
+        value={localNotes}
+        onChange={(e) => setLocalNotes(e.target.value)}
+        onBlur={() => {
+          handleFieldInteraction()
+          if (localNotes !== leaderboard.notes) {
+            updateTestResult(setLeaderboard, "notes", localNotes)
+          }
+        }}
+        className="text-xs h-16 resize-none"
+        rows={2}
+      />
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -522,13 +562,12 @@ export default function Page() {
                       <Label className="text-sm font-medium text-gray-800">Leaderboard Display</Label>
                       <div className="flex gap-2 text-sm">
                         <span
-                          className={`px-2 py-1 rounded text-xs ${
-                            leaderboard.status === "pass"
-                              ? "bg-green-100 text-green-800"
-                              : leaderboard.status === "fail"
-                                ? "bg-red-100 text-red-800"
-                                : "bg-gray-100 text-gray-600"
-                          }`}
+                          className={`px-2 py-1 rounded text-xs ${leaderboard.status === "pass"
+                            ? "bg-green-100 text-green-800"
+                            : leaderboard.status === "fail"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-600"
+                            }`}
                         >
                           {getStatusSymbol(leaderboard.status)} {leaderboard.status.toUpperCase()}
                         </span>
@@ -592,18 +631,7 @@ export default function Page() {
                       </div>
                     </RadioGroup>
 
-                    <Textarea
-                      id="leaderboard-notes"
-                      name="leaderboard-notes"
-                      placeholder="Notes..."
-                      value={leaderboard.notes}
-                      onChange={(e) => {
-                        handleFieldInteraction()
-                        updateTestResult(setLeaderboard, "notes", e.target.value)
-                      }}
-                      className="text-xs h-16 resize-none"
-                      rows={2}
-                    />
+                    <LeaderboardNotes />
                   </div>
                 </div>
 

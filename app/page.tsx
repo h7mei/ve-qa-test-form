@@ -17,13 +17,13 @@ interface TestResult {
 export default function Page() {
   const formRef = useRef<HTMLDivElement>(null)
   const [testerName, setTesterName] = useState("")
-  const [testDate, setTestDate] = useState("")
-  const [applicationVersion, setApplicationVersion] = useState("")
+  const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0])
+  const [applicationVersion, setApplicationVersion] = useState("v2.7.8")
   const [testEnvironment, setTestEnvironment] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
 
-  const [showTutorial, setShowTutorial] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(true)
   const [currentTutorialStep, setCurrentTutorialStep] = useState(0)
   const [hasInteracted, setHasInteracted] = useState(false)
 
@@ -574,32 +574,7 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <div className="mb-2">
-                      <Label className="text-xs font-semibold">Display Type:</Label>
-                      <RadioGroup
-                        value={leaderboard.type}
-                        onValueChange={(value) => {
-                          handleFieldInteraction()
-                          updateTestResult(setLeaderboard, "type", value as "only" | "full")
-                        }}
-                        className="flex gap-4 mt-1"
-                        id="leaderboard-type"
-                        name="leaderboard-type"
-                      >
-                        <div className="flex items-center space-x-1">
-                          <RadioGroupItem value="only" id="leaderboard-only" className="h-3 w-3" />
-                          <Label htmlFor="leaderboard-only" className="text-xs">
-                            Only
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <RadioGroupItem value="full" id="leaderboard-full" className="h-3 w-3" />
-                          <Label htmlFor="leaderboard-full" className="text-xs">
-                            Full
-                          </Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
+
 
                     <RadioGroup
                       value={leaderboard.status}
@@ -740,6 +715,60 @@ export default function Page() {
           </form>
         </div>
       </div>
+
+      {/* Tutorial Modal */}
+      {showTutorial && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4 relative">
+            <div className="text-center">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
+                {tutorialSteps[currentTutorialStep].title}
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                {tutorialSteps[currentTutorialStep].content}
+              </p>
+              
+              <div className="flex justify-between items-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowTutorial(false)}
+                  className="text-sm"
+                >
+                  Skip Tutorial
+                </Button>
+                
+                <div className="flex gap-2">
+                  {currentTutorialStep > 0 && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentTutorialStep(prev => prev - 1)}
+                      className="text-sm"
+                    >
+                      Previous
+                    </Button>
+                  )}
+                  
+                  {currentTutorialStep < tutorialSteps.length - 1 ? (
+                    <Button
+                      onClick={() => setCurrentTutorialStep(prev => prev + 1)}
+                      className="text-sm"
+                    >
+                      Next
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => setShowTutorial(false)}
+                      className="text-sm"
+                    >
+                      Finish
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

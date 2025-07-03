@@ -437,9 +437,10 @@ export default function Page() {
                     handleFieldInteraction()
                     setApplicationVersion(e.target.value)
                   }}
-                  className="text-sm h-8 mt-1"
+                  className="text-sm h-8 mt-1 bg-gray-100"
                   placeholder="v1.0.0"
                   required
+                  readOnly
                 />
               </div>
             </div>

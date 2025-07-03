@@ -19,7 +19,6 @@ export default function Page() {
   const [testerName, setTesterName] = useState("")
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0])
   const [applicationVersion, setApplicationVersion] = useState("v2.7.8")
-  const [testEnvironment, setTestEnvironment] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
 
@@ -173,10 +172,6 @@ export default function Page() {
       setSubmitMessage("Please enter application version")
       return false
     }
-    if (!testEnvironment.trim()) {
-      setSubmitMessage("Please enter test environment")
-      return false
-    }
 
     // Check if all test sections have at least one field filled
     const allTests = [
@@ -216,7 +211,7 @@ export default function Page() {
         tester_name: testerName.trim(),
         test_date: testDate,
         application_version: applicationVersion.trim(),
-        test_environment: testEnvironment.trim(),
+        test_environment: "Default",
         auth_tests: {
           register: registerTest,
           login: loginTest,
@@ -402,7 +397,7 @@ export default function Page() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Test Information - Full Width */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 p-6 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-6 bg-gray-50 rounded-lg">
               <div>
                 <Label htmlFor="testerName" className="text-xs font-semibold text-gray-700">TESTER NAME *</Label>
                 <Input
@@ -444,21 +439,6 @@ export default function Page() {
                   }}
                   className="text-sm h-8 mt-1"
                   placeholder="v1.0.0"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="testEnvironment" className="text-xs font-semibold text-gray-700">ENVIRONMENT *</Label>
-                <Input
-                  id="testEnvironment"
-                  name="testEnvironment"
-                  value={testEnvironment}
-                  onChange={(e) => {
-                    handleFieldInteraction()
-                    setTestEnvironment(e.target.value)
-                  }}
-                  className="text-sm h-8 mt-1"
-                  placeholder="Production"
                   required
                 />
               </div>

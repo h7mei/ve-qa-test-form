@@ -54,8 +54,7 @@ export default function DataPage() {
     if (searchTerm) {
       filtered = filtered.filter(report =>
         report.tester_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.application_version.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.test_environment.toLowerCase().includes(searchTerm.toLowerCase())
+        report.application_version.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
@@ -105,7 +104,7 @@ export default function DataPage() {
 
   const exportToCSV = () => {
     const headers = [
-      'ID', 'Tester Name', 'Test Date', 'App Version', 'Environment',
+      'ID', 'Tester Name', 'Test Date', 'App Version',
       'Auth Tests', 'Main Section Tests', 'Side Mission Tests',
       'Leaderboard', 'Toko', 'Komunitas', 'Hasil User', 'Sertifikat', 'User Profile',
       'Created At'
@@ -118,7 +117,6 @@ export default function DataPage() {
         `"${report.tester_name}"`,
         report.test_date,
         `"${report.application_version}"`,
-        `"${report.test_environment}"`,
         `"${JSON.stringify(report.auth_tests)}"`,
         `"${JSON.stringify(report.main_section_tests)}"`,
         `"${JSON.stringify(report.side_mission_tests)}"`,
@@ -257,7 +255,6 @@ export default function DataPage() {
                     <th className="text-left p-4 font-medium text-gray-900">Tester</th>
                     <th className="text-left p-4 font-medium text-gray-900">Test Date</th>
                     <th className="text-left p-4 font-medium text-gray-900">App Version</th>
-                    <th className="text-left p-4 font-medium text-gray-900">Environment</th>
                     <th className="text-left p-4 font-medium text-gray-900">Test Summary</th>
                     <th className="text-left p-4 font-medium text-gray-900">Actions</th>
                   </tr>
@@ -275,9 +272,6 @@ export default function DataPage() {
                         </td>
                         <td className="p-4 text-sm text-gray-600">
                           {report.application_version}
-                        </td>
-                        <td className="p-4 text-sm text-gray-600">
-                          {report.test_environment}
                         </td>
                         <td className="p-4">
                           <div className="flex gap-1">
@@ -350,7 +344,7 @@ function ReportDetails({ report }: { report: QATestReport }) {
   return (
     <div className="space-y-6">
       {/* Basic Information */}
-      <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+      <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
         <div>
           <div className="text-sm font-medium text-gray-600">Tester Name</div>
           <p className="text-sm">{report.tester_name}</p>
@@ -362,10 +356,6 @@ function ReportDetails({ report }: { report: QATestReport }) {
         <div>
           <div className="text-sm font-medium text-gray-600">App Version</div>
           <p className="text-sm">{report.application_version}</p>
-        </div>
-        <div>
-          <div className="text-sm font-medium text-gray-600">Environment</div>
-          <p className="text-sm">{report.test_environment}</p>
         </div>
       </div>
 

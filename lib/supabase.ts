@@ -10,7 +10,6 @@ export type QATestReport = {
   tester_name: string;
   test_date: string;
   application_version: string;
-  test_environment: string;
   auth_tests: Record<string, { status: string; notes: string }>;
   main_section_tests: Record<string, { status: string; notes: string }>;
   side_mission_tests: Record<string, { status: string; notes: string }>;

@@ -211,7 +211,6 @@ export default function Page() {
         tester_name: testerName.trim(),
         test_date: testDate,
         application_version: applicationVersion.trim(),
-        test_environment: "Default",
         auth_tests: {
           register: registerTest,
           login: loginTest,

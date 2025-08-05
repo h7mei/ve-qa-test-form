@@ -6,12 +6,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { User, Shield, Store, Users, Award, Settings, HelpCircle, Save, Loader2, ArrowLeft } from "lucide-react"
 import { supabase, type QATestReport } from "../../lib/supabase"
-import Link from "next/link"
 import { StatusBadge } from "@/components/ui/status-badge"
+import Swal from 'sweetalert2'
 
 interface TestResult {
   status: "pass" | "fail" | "not-tested"
@@ -19,10 +18,9 @@ interface TestResult {
 }
 
 export default function Page() {
-  const formRef = useRef<HTMLDivElement>(null)
   const [testerName, setTesterName] = useState("")
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0])
-  const [applicationVersion, setApplicationVersion] = useState("v2.7.8")
+  const [applicationVersion, setApplicationVersion] = useState("v2.7.9")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
 
@@ -76,6 +74,7 @@ export default function Page() {
   // Other tests
   const [misiPilahSampahTest, setMisiPilahSampahTest] = useState<TestResult>({ status: "not-tested", notes: "" })
   const [ikutAksiTest, setIkutAksiTest] = useState<TestResult>({ status: "not-tested", notes: "" })
+  const [foodPrintTest, setFoodPrintTest] = useState<TestResult>({ status: "not-tested", notes: "" })
 
   interface LeaderboardTest extends TestResult {
     type: "only" | "full" | ""
@@ -116,6 +115,9 @@ export default function Page() {
 
   const handleIkutAksiStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setIkutAksiTest(prev => ({ ...prev, status })), [])
   const handleIkutAksiNotesChange = useCallback((notes: string) => setIkutAksiTest(prev => ({ ...prev, notes })), [])
+
+  const handleFoodPrintStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setFoodPrintTest(prev => ({ ...prev, status })), [])
+  const handleFoodPrintNotesChange = useCallback((notes: string) => setFoodPrintTest(prev => ({ ...prev, notes })), [])
 
   const handleTokoStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setToko(prev => ({ ...prev, status })), [])
   const handleTokoNotesChange = useCallback((notes: string) => setToko(prev => ({ ...prev, notes })), [])
@@ -164,6 +166,7 @@ export default function Page() {
       menangahTest,
       misiPilahSampahTest,
       ikutAksiTest,
+      foodPrintTest,
       leaderboard,
       toko,
       komunitas,
@@ -180,6 +183,35 @@ export default function Page() {
 
     return true
   }
+
+  const resetForm = () => {
+    setTesterName("")
+    setTestDate(new Date().toISOString().split('T')[0])
+    setApplicationVersion("v2.7.9")
+    setSubmitMessage("")
+    setShowTutorial(false)
+    setCurrentTutorialStep(0)
+    setHasInteracted(false)
+
+    // Reset all test results
+    setRegisterTest({ status: "not-tested", notes: "" })
+    setLoginTest({ status: "not-tested", notes: "" })
+    setForgotPasswordTest({ status: "not-tested", notes: "" })
+    setProduksiTest({ status: "not-tested", notes: "" })
+    setKonsumsiTest({ status: "not-tested", notes: "" })
+    setMenangahTest({ status: "not-tested", notes: "" })
+    setMisiPilahSampahTest({ status: "not-tested", notes: "" })
+    setIkutAksiTest({ status: "not-tested", notes: "" })
+    setFoodPrintTest({ status: "not-tested", notes: "" })
+    setLeaderboard({ status: "not-tested", notes: "", type: "" })
+    setToko({ status: "not-tested", notes: "" })
+    setKomunitas({ status: "not-tested", notes: "" })
+    setHasilUser({ status: "not-tested", notes: "" })
+    setSertifikat({ status: "not-tested", notes: "" })
+    setUserProfile({ status: "not-tested", notes: "" })
+  }
+
+
 
   const submitToSupabase = async () => {
     if (!validateForm()) return
@@ -206,6 +238,7 @@ export default function Page() {
           misiPilahSampah: misiPilahSampahTest,
           ikutAksi: ikutAksiTest,
         },
+        food_print_tests: foodPrintTest,
         leaderboard,
         toko,
         komunitas,
@@ -220,11 +253,45 @@ export default function Page() {
         throw error
       }
 
-      setSubmitMessage("Report submitted successfully!")
+      // Show success alert with SweetAlert2
+      await Swal.fire({
+        title: 'Success!',
+        text: 'Report submitted successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        background: '#ffffff',
+        color: '#000000',
+        confirmButtonColor: '#000000',
+        customClass: {
+          popup: 'swal2-custom-popup',
+          title: 'swal2-custom-title',
+          htmlContainer: 'swal2-custom-content',
+          confirmButton: 'swal2-custom-confirm'
+        }
+      })
+
+      // Reset form after successful submission
+      resetForm()
       console.log("Report saved:", data)
     } catch (error) {
       console.error("Error submitting report:", error)
-      setSubmitMessage("Error submitting report. Please try again.")
+      
+      // Show error alert with SweetAlert2
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Error submitting report. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        background: '#ffffff',
+        color: '#000000',
+        confirmButtonColor: '#000000',
+        customClass: {
+          popup: 'swal2-custom-popup',
+          title: 'swal2-custom-title',
+          htmlContainer: 'swal2-custom-content',
+          confirmButton: 'swal2-custom-confirm'
+        }
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -377,13 +444,11 @@ export default function Page() {
       <div className="container mx-auto px-6 max-w-7xl">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Link>
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold tracking-tight mb-2">Quality Assurance Test Report</h1>
-            <p className="text-muted-foreground">Application Testing Validation Form</p>
+          <div className="flex justify-between items-center mb-8">
+            <div className="text-center flex-1">
+              <h1 className="text-3xl font-bold tracking-tight mb-2">Quality Assurance Test Report</h1>
+              <p className="text-muted-foreground">Application Testing Validation Form</p>
+            </div>
           </div>
         </div>
 
@@ -533,6 +598,25 @@ export default function Page() {
                     notes={ikutAksiTest.notes}
                     onStatusChange={handleIkutAksiStatusChange}
                     onNotesChange={handleIkutAksiNotesChange}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* FoodPrint */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5" />
+                    FoodPrint
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <MemoizedCompactTestItem
+                    label="FoodPrint Feature"
+                    status={foodPrintTest.status}
+                    notes={foodPrintTest.notes}
+                    onStatusChange={handleFoodPrintStatusChange}
+                    onNotesChange={handleFoodPrintNotesChange}
                   />
                 </CardContent>
               </Card>
@@ -713,19 +797,21 @@ export default function Page() {
                     </AlertDescription>
                   </Alert>
                 )}
-                <Button type="submit" disabled={isSubmitting} className="flex items-center gap-2 px-8 py-3 text-lg">
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-5 w-5" />
-                      Submit Report
-                    </>
-                  )}
-                </Button>
+                <div className="flex gap-4">
+                  <Button type="submit" disabled={isSubmitting} className="flex items-center gap-2 px-8 py-3 text-lg">
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-5 w-5" />
+                        Submit Report
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

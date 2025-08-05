@@ -13,6 +13,7 @@ export type QATestReport = {
   auth_tests: Record<string, { status: string; notes: string }>;
   main_section_tests: Record<string, { status: string; notes: string }>;
   side_mission_tests: Record<string, { status: string; notes: string }>;
+  food_print_tests: { status: string; notes: string };
   leaderboard: { status: string; notes: string; type: string };
   toko: { status: string; notes: string };
   komunitas: { status: string; notes: string };
@@ -26,13 +27,16 @@ export type QATestReport = {
 export type InternalTestingCase = {
   id?: string;
   test_name: string;
-  sections: Record<string, {
-    textFeedback: string;
-    imageFile?: File | null;
-    imageUrl?: string;
-    feedback: string;
-    status: string;
-  }>;
+  sections: Record<
+    string,
+    {
+      textFeedback: string;
+      imageFile?: File | null;
+      imageUrl?: string;
+      feedback: string;
+      status: string;
+    }
+  >;
   created_at?: string;
   updated_at?: string;
 };
@@ -40,26 +44,22 @@ export type InternalTestingCase = {
 // Helper function to upload image file to Supabase storage
 export const uploadTestingImage = async (file: File, filename: string): Promise<string | null> => {
   try {
-    const { data, error } = await supabase.storage
-      .from('testing-images')
-      .upload(filename, file, {
-        cacheControl: '3600',
-        upsert: true
-      });
+    const { data, error } = await supabase.storage.from("testing-images").upload(filename, file, {
+      cacheControl: "3600",
+      upsert: true,
+    });
 
     if (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       return null;
     }
 
     // Get public URL for the uploaded image
-    const { data: urlData } = supabase.storage
-      .from('testing-images')
-      .getPublicUrl(data.path);
+    const { data: urlData } = supabase.storage.from("testing-images").getPublicUrl(data.path);
 
     return urlData.publicUrl;
   } catch (error) {
-    console.error('Error uploading image:', error);
+    console.error("Error uploading image:", error);
     return null;
   }
 };
@@ -68,24 +68,26 @@ export const uploadTestingImage = async (file: File, filename: string): Promise<
 export const fetchInternalTestingCases = async (): Promise<InternalTestingCase[]> => {
   try {
     const { data, error } = await supabase
-      .from('internal_testing_cases')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("internal_testing_cases")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching internal testing cases:', error);
+      console.error("Error fetching internal testing cases:", error);
       return [];
     }
 
     return data || [];
   } catch (error) {
-    console.error('Error fetching internal testing cases:', error);
+    console.error("Error fetching internal testing cases:", error);
     return [];
   }
 };
 
 // Helper function to submit internal testing case with image uploads
-export const submitInternalTestingCase = async (testCase: InternalTestingCase): Promise<{ success: boolean; error?: string }> => {
+export const submitInternalTestingCase = async (
+  testCase: InternalTestingCase
+): Promise<{ success: boolean; error?: string }> => {
   try {
     const sectionsWithUrls: Record<string, any> = {};
 
@@ -95,13 +97,16 @@ export const submitInternalTestingCase = async (testCase: InternalTestingCase): 
         textFeedback: sectionData.textFeedback,
         feedback: sectionData.feedback,
         status: sectionData.status,
-        imageUrl: null
+        imageUrl: null,
       };
 
       // Upload image if present
       if (sectionData.imageFile) {
         const timestamp = Date.now();
-        const filename = `${testCase.test_name.replace(/\s+/g, '_')}_${sectionName.replace(/\s+/g, '_')}_${timestamp}.${sectionData.imageFile.name.split('.').pop()}`;
+        const filename = `${testCase.test_name.replace(/\s+/g, "_")}_${sectionName.replace(
+          /\s+/g,
+          "_"
+        )}_${timestamp}.${sectionData.imageFile.name.split(".").pop()}`;
         const imageUrl = await uploadTestingImage(sectionData.imageFile, filename);
         sectionsWithUrls[sectionName].imageUrl = imageUrl;
       }
@@ -109,21 +114,21 @@ export const submitInternalTestingCase = async (testCase: InternalTestingCase): 
 
     // Insert the record into the database
     const { data, error } = await supabase
-      .from('internal_testing_cases')
+      .from("internal_testing_cases")
       .insert({
         test_name: testCase.test_name,
-        sections: sectionsWithUrls
+        sections: sectionsWithUrls,
       })
       .select();
 
     if (error) {
-      console.error('Error inserting testing case:', error);
+      console.error("Error inserting testing case:", error);
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error submitting testing case:', error);
-    return { success: false, error: 'Failed to submit testing case' };
+    console.error("Error submitting testing case:", error);
+    return { success: false, error: "Failed to submit testing case" };
   }
 };

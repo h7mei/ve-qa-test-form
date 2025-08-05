@@ -72,6 +72,7 @@ export default function DataPage() {
       ...Object.values(report.auth_tests),
       ...Object.values(report.main_section_tests),
       ...Object.values(report.side_mission_tests),
+      report.food_print_tests,
       report.leaderboard,
       report.toko,
       report.komunitas,
@@ -98,7 +99,7 @@ export default function DataPage() {
   const exportToCSV = () => {
     const headers = [
       'ID', 'Tester Name', 'Test Date', 'App Version',
-      'Auth Tests', 'Main Section Tests', 'Side Mission Tests',
+      'Auth Tests', 'Main Section Tests', 'Side Mission Tests', 'FoodPrint Tests',
       'Leaderboard', 'Toko', 'Komunitas', 'Hasil User', 'Sertifikat', 'User Profile',
       'Created At'
     ]
@@ -113,6 +114,7 @@ export default function DataPage() {
         `"${JSON.stringify(report.auth_tests)}"`,
         `"${JSON.stringify(report.main_section_tests)}"`,
         `"${JSON.stringify(report.side_mission_tests)}"`,
+        `"${JSON.stringify(report.food_print_tests)}"`,
         `"${JSON.stringify(report.leaderboard)}"`,
         `"${JSON.stringify(report.toko)}"`,
         `"${JSON.stringify(report.komunitas)}"`,
@@ -426,6 +428,24 @@ function ReportDetails({ report }: { report: QATestReport }) {
                 </div>
               </div>
             ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* FoodPrint Tests */}
+      <Card>
+        <CardHeader>
+          <CardTitle>FoodPrint Tests</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-3 bg-muted/50 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">FoodPrint Feature</span>
+              <StatusBadge status={report.food_print_tests.status} />
+            </div>
+            {report.food_print_tests.notes && (
+              <p className="text-xs text-muted-foreground">{report.food_print_tests.notes}</p>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -9,8 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { submitInternalTestingCase, type InternalTestingCase } from "@/lib/supabase"
-import Link from "next/link"
-import { Database } from "lucide-react"
+import Swal from 'sweetalert2'
 
 interface SectionData {
   textFeedback: string
@@ -50,6 +49,23 @@ export default function InternalTestingCasePage() {
     }, {} as Record<string, SectionData>)
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const resetForm = () => {
+    setForm({
+      testName: "",
+      sections: sections.reduce((acc, section) => {
+        acc[section] = {
+          textFeedback: "",
+          imageFile: null,
+          feedback: "",
+          status: "not-tested"
+        }
+        return acc
+      }, {} as Record<string, SectionData>)
+    })
+  }
+
+
 
   const handleInputChange = (field: keyof TestingCaseForm, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -103,26 +119,60 @@ export default function InternalTestingCasePage() {
       const result = await submitInternalTestingCase(testCase)
       
       if (result.success) {
-        toast.success("All testing cases submitted successfully!")
+        // Show success alert with SweetAlert2
+        await Swal.fire({
+          title: 'Success!',
+          text: 'All testing cases submitted successfully!',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          background: '#ffffff',
+          color: '#000000',
+          confirmButtonColor: '#000000',
+          customClass: {
+            popup: 'swal2-custom-popup',
+            title: 'swal2-custom-title',
+            htmlContainer: 'swal2-custom-content',
+            confirmButton: 'swal2-custom-confirm'
+          }
+        })
         
         // Reset form
-        setForm({
-          testName: "",
-          sections: sections.reduce((acc, section) => {
-            acc[section] = {
-              textFeedback: "",
-              imageFile: null,
-              feedback: "",
-              status: "not-tested"
-            }
-            return acc
-          }, {} as Record<string, SectionData>)
-        })
+        resetForm()
       } else {
-        toast.error(`Failed to submit testing cases: ${result.error}`)
+        // Show error alert with SweetAlert2
+        await Swal.fire({
+          title: 'Error!',
+          text: `Failed to submit testing cases: ${result.error}`,
+          icon: 'error',
+          confirmButtonText: 'OK',
+          background: '#ffffff',
+          color: '#000000',
+          confirmButtonColor: '#000000',
+          customClass: {
+            popup: 'swal2-custom-popup',
+            title: 'swal2-custom-title',
+            htmlContainer: 'swal2-custom-content',
+            confirmButton: 'swal2-custom-confirm'
+          }
+        })
       }
     } catch (error) {
-      toast.error("Failed to submit testing cases")
+      // Show error alert with SweetAlert2
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Failed to submit testing cases',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        background: '#ffffff',
+        color: '#000000',
+        confirmButtonColor: '#000000',
+        customClass: {
+          popup: 'swal2-custom-popup',
+          title: 'swal2-custom-title',
+          htmlContainer: 'swal2-custom-content',
+          confirmButton: 'swal2-custom-confirm'
+        }
+      })
       console.error("Error:", error)
     } finally {
       setIsSubmitting(false)
@@ -139,24 +189,18 @@ export default function InternalTestingCasePage() {
                 <CardTitle className="text-2xl">Internal Testing Case - All Sections</CardTitle>
                 <p className="text-muted-foreground">Fill out testing information for all sections in one submission</p>
               </div>
-              <Link href="/internal-testing-case/data">
-                <Button variant="outline" size="sm">
-                  <Database className="h-4 w-4 mr-2" />
-                  View Reports
-                </Button>
-              </Link>
             </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Test Name */}
               <div className="space-y-2">
-                <Label htmlFor="testName">Test Name</Label>
+                <Label htmlFor="testName">Tester Name</Label>
                 <Input
                   id="testName"
                   value={form.testName}
                   onChange={(e) => handleInputChange("testName", e.target.value)}
-                  placeholder="Enter specific test description (e.g., 'Homepage Responsiveness Test')"
+                  placeholder="Enter your name"
                   required
                 />
               </div>
@@ -262,9 +306,11 @@ export default function InternalTestingCasePage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Submit All Testing Cases"}
-              </Button>
+              <div className="flex gap-4">
+                <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                  {isSubmitting ? "Submitting..." : "Submit All Testing Cases"}
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>

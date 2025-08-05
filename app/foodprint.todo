@@ -1,0 +1,18 @@
+Section	Test	Text feedback	Image	Feedback
+Homepage	Display of WFC section looks normal			
+Riwayat Catatan	Empty (if no inputs yet), filled properly (if inputs already)			
+Riwayat Catatan	Filter properly the inputs made at different dates			
+Tambah Catatan (flow)	Click on Tambah Catatan triggers guide popup			
+Tambah Catatan (flow)	Search "UHT" and "123" in search bar and test if results come out properly			
+Tambah Catatan (flow)	Add items and review if weight adds up			
+Tambah Catatan (flow)	Go back before submitting data, check behavior			
+Tambah Catatan (flow)	Go back after submitting data, check behavior, go forward, see if submit triggers once or if triggers everytime			
+Tambah Catatan (Streak)	Get a Streak 1, check if rewards are applied			
+Tambah Catatan (Streak)	Get a Streak 2, check if rewards are applied			
+Tambah Catatan (Streak)	Get a Streak 3, check if rewards are applied			
+Tambah Catatan (Streak)	Get a Streak 4, check if rewards are applied			
+Streak page	Press Streak image, check if page matches your current streak	Need a text block about streak		
+Footprint INFO popup	Learn more about WFC and streak in the Info popup			
+Cache emptying scenario	Empty cache and check Riwayat catatan			
+Logout/Login scenario	Logout and login again, check Riwayat catatan			
+Uninstall scenario	Uninstall and reinstall SampApp, check Riwayat Catatan			  

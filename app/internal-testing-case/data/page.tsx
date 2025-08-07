@@ -263,10 +263,10 @@ export default function InternalTestingDataPage() {
                             <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">
                               {summary.passed}
                             </Badge>
-                            <Badge variant="destructive">
+                            <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100">
                               {summary.failed}
                             </Badge>
-                            <Badge variant="secondary">
+                            <Badge variant="secondary" className="bg-gray-100 text-gray-800 hover:bg-gray-100">
                               {summary.notTested}
                             </Badge>
                           </div>

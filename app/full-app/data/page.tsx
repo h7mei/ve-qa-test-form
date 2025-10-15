@@ -73,6 +73,7 @@ export default function DataPage() {
       ...Object.values(report.main_section_tests),
       ...Object.values(report.side_mission_tests),
       report.food_print_tests,
+      ...Object.values(report.referral_tests || {}),
       report.leaderboard,
       report.toko,
       report.komunitas,
@@ -99,7 +100,7 @@ export default function DataPage() {
   const exportToCSV = () => {
     const headers = [
       'ID', 'Tester Name', 'Test Date', 'App Version',
-      'Auth Tests', 'Main Section Tests', 'Side Mission Tests', 'FoodPrint Tests',
+      'Auth Tests', 'Main Section Tests', 'Side Mission Tests', 'FoodPrint Tests', 'Referral Tests',
       'Leaderboard', 'Toko', 'Komunitas', 'Hasil User', 'Sertifikat', 'User Profile',
       'Created At'
     ]
@@ -115,6 +116,7 @@ export default function DataPage() {
         `"${JSON.stringify(report.main_section_tests)}"`,
         `"${JSON.stringify(report.side_mission_tests)}"`,
         `"${JSON.stringify(report.food_print_tests)}"`,
+        `"${JSON.stringify(report.referral_tests || {})}"`,
         `"${JSON.stringify(report.leaderboard)}"`,
         `"${JSON.stringify(report.toko)}"`,
         `"${JSON.stringify(report.komunitas)}"`,
@@ -449,6 +451,32 @@ function ReportDetails({ report }: { report: QATestReport }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Referral Tests */}
+      {report.referral_tests && Object.keys(report.referral_tests).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Referral Tests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {Object.entries(report.referral_tests).map(([key, test]) => (
+                <div key={key} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <span className="text-sm font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={test.status} />
+                    {test.notes && (
+                      <span className="text-xs text-muted-foreground max-w-xs truncate" title={test.notes}>
+                        {test.notes}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Other Tests */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -14,6 +14,7 @@ export type QATestReport = {
   main_section_tests: Record<string, { status: string; notes: string }>;
   side_mission_tests: Record<string, { status: string; notes: string }>;
   food_print_tests: { status: string; notes: string };
+  referral_tests: Record<string, { status: string; notes: string }>;
   leaderboard: { status: string; notes: string; type: string };
   toko: { status: string; notes: string };
   komunitas: { status: string; notes: string };

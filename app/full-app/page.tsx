@@ -20,7 +20,7 @@ interface TestResult {
 export default function Page() {
   const [testerName, setTesterName] = useState("")
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0])
-  const [applicationVersion, setApplicationVersion] = useState("v2.7.9")
+  const [applicationVersion, setApplicationVersion] = useState("v2.8.1")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
 
@@ -76,6 +76,12 @@ export default function Page() {
   const [ikutAksiTest, setIkutAksiTest] = useState<TestResult>({ status: "not-tested", notes: "" })
   const [foodPrintTest, setFoodPrintTest] = useState<TestResult>({ status: "not-tested", notes: "" })
 
+  // Referral tests
+  const [referralSpreadTest, setReferralSpreadTest] = useState<TestResult>({ status: "not-tested", notes: "" })
+  const [voucherCashPurchaseTest, setVoucherCashPurchaseTest] = useState<TestResult>({ status: "not-tested", notes: "" })
+  const [paymentInfoTest, setPaymentInfoTest] = useState<TestResult>({ status: "not-tested", notes: "" })
+  const [voucherCashUsageTest, setVoucherCashUsageTest] = useState<TestResult>({ status: "not-tested", notes: "" })
+
   interface LeaderboardTest extends TestResult {
     type: "only" | "full" | ""
   }
@@ -118,6 +124,18 @@ export default function Page() {
 
   const handleFoodPrintStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setFoodPrintTest(prev => ({ ...prev, status })), [])
   const handleFoodPrintNotesChange = useCallback((notes: string) => setFoodPrintTest(prev => ({ ...prev, notes })), [])
+
+  const handleReferralSpreadStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setReferralSpreadTest(prev => ({ ...prev, status })), [])
+  const handleReferralSpreadNotesChange = useCallback((notes: string) => setReferralSpreadTest(prev => ({ ...prev, notes })), [])
+
+  const handleVoucherCashPurchaseStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setVoucherCashPurchaseTest(prev => ({ ...prev, status })), [])
+  const handleVoucherCashPurchaseNotesChange = useCallback((notes: string) => setVoucherCashPurchaseTest(prev => ({ ...prev, notes })), [])
+
+  const handlePaymentInfoStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setPaymentInfoTest(prev => ({ ...prev, status })), [])
+  const handlePaymentInfoNotesChange = useCallback((notes: string) => setPaymentInfoTest(prev => ({ ...prev, notes })), [])
+
+  const handleVoucherCashUsageStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setVoucherCashUsageTest(prev => ({ ...prev, status })), [])
+  const handleVoucherCashUsageNotesChange = useCallback((notes: string) => setVoucherCashUsageTest(prev => ({ ...prev, notes })), [])
 
   const handleTokoStatusChange = useCallback((status: 'pass' | 'fail' | 'not-tested') => setToko(prev => ({ ...prev, status })), [])
   const handleTokoNotesChange = useCallback((notes: string) => setToko(prev => ({ ...prev, notes })), [])
@@ -167,6 +185,10 @@ export default function Page() {
       misiPilahSampahTest,
       ikutAksiTest,
       foodPrintTest,
+      referralSpreadTest,
+      voucherCashPurchaseTest,
+      paymentInfoTest,
+      voucherCashUsageTest,
       leaderboard,
       toko,
       komunitas,
@@ -203,6 +225,10 @@ export default function Page() {
     setMisiPilahSampahTest({ status: "not-tested", notes: "" })
     setIkutAksiTest({ status: "not-tested", notes: "" })
     setFoodPrintTest({ status: "not-tested", notes: "" })
+    setReferralSpreadTest({ status: "not-tested", notes: "" })
+    setVoucherCashPurchaseTest({ status: "not-tested", notes: "" })
+    setPaymentInfoTest({ status: "not-tested", notes: "" })
+    setVoucherCashUsageTest({ status: "not-tested", notes: "" })
     setLeaderboard({ status: "not-tested", notes: "", type: "" })
     setToko({ status: "not-tested", notes: "" })
     setKomunitas({ status: "not-tested", notes: "" })
@@ -239,6 +265,12 @@ export default function Page() {
           ikutAksi: ikutAksiTest,
         },
         food_print_tests: foodPrintTest,
+        referral_tests: {
+          referralSpread: referralSpreadTest,
+          voucherCashPurchase: voucherCashPurchaseTest,
+          paymentInfo: paymentInfoTest,
+          voucherCashUsage: voucherCashUsageTest,
+        },
         leaderboard,
         toko,
         komunitas,
@@ -780,6 +812,46 @@ export default function Page() {
                     notes={userProfile.notes}
                     onStatusChange={handleUserProfileStatusChange}
                     onNotesChange={handleUserProfileNotesChange}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Referral */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Referral
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <MemoizedCompactTestItem
+                    label="Menyebarkan Referral (Buat orang lain menggunakan kode referral mu)"
+                    status={referralSpreadTest.status}
+                    notes={referralSpreadTest.notes}
+                    onStatusChange={handleReferralSpreadStatusChange}
+                    onNotesChange={handleReferralSpreadNotesChange}
+                  />
+                  <MemoizedCompactTestItem
+                    label="Membeli voucher cash"
+                    status={voucherCashPurchaseTest.status}
+                    notes={voucherCashPurchaseTest.notes}
+                    onStatusChange={handleVoucherCashPurchaseStatusChange}
+                    onNotesChange={handleVoucherCashPurchaseNotesChange}
+                  />
+                  <MemoizedCompactTestItem
+                    label="Menambahkan payment information"
+                    status={paymentInfoTest.status}
+                    notes={paymentInfoTest.notes}
+                    onStatusChange={handlePaymentInfoStatusChange}
+                    onNotesChange={handlePaymentInfoNotesChange}
+                  />
+                  <MemoizedCompactTestItem
+                    label="Menggunakan voucher cash"
+                    status={voucherCashUsageTest.status}
+                    notes={voucherCashUsageTest.notes}
+                    onStatusChange={handleVoucherCashUsageStatusChange}
+                    onNotesChange={handleVoucherCashUsageNotesChange}
                   />
                 </CardContent>
               </Card>

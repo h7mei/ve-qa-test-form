@@ -8,6 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export type QATestReport = {
   id?: string;
   tester_name: string;
+  device_type: "ios" | "android";
   test_date: string;
   application_version: string;
   auth_tests: Record<string, { status: string; notes: string }>;

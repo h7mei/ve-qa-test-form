@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { User, Shield, Store, Users, Award, Settings, HelpCircle, Save, Loader2, ArrowLeft } from "lucide-react"
 import { supabase, type QATestReport } from "../../lib/supabase"
 import { StatusBadge } from "@/components/ui/status-badge"
 import Swal from 'sweetalert2'
+import confetti from 'canvas-confetti'
 
 interface TestResult {
   status: "pass" | "fail" | "not-tested"
@@ -19,6 +21,7 @@ interface TestResult {
 
 export default function Page() {
   const [testerName, setTesterName] = useState("")
+  const [deviceType, setDeviceType] = useState<"ios" | "android">("ios")
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0])
   const [applicationVersion, setApplicationVersion] = useState("v2.8.1")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -165,6 +168,10 @@ export default function Page() {
       setSubmitMessage("Please enter tester name")
       return false
     }
+    if (!deviceType) {
+      setSubmitMessage("Please select device type")
+      return false
+    }
     if (!testDate) {
       setSubmitMessage("Please select test date")
       return false
@@ -208,6 +215,7 @@ export default function Page() {
 
   const resetForm = () => {
     setTesterName("")
+    setDeviceType("ios")
     setTestDate(new Date().toISOString().split('T')[0])
     setApplicationVersion("v2.7.9")
     setSubmitMessage("")
@@ -248,6 +256,7 @@ export default function Page() {
     try {
       const reportData: Omit<QATestReport, "id" | "created_at" | "updated_at"> = {
         tester_name: testerName.trim(),
+        device_type: deviceType,
         test_date: testDate,
         application_version: applicationVersion.trim(),
         auth_tests: {
@@ -284,6 +293,13 @@ export default function Page() {
       if (error) {
         throw error
       }
+
+      // Trigger confetti celebration
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      })
 
       // Show success alert with SweetAlert2
       await Swal.fire({
@@ -492,7 +508,7 @@ export default function Page() {
               <CardDescription>Basic information about the test session</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="testerName">Tester Name *</Label>
                   <Input
@@ -507,16 +523,31 @@ export default function Page() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="deviceType">Device Type *</Label>
+                  <Select
+                    value={deviceType}
+                    onValueChange={(value: "ios" | "android") => {
+                      handleFieldInteraction()
+                      setDeviceType(value)
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select device type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ios">iOS</SelectItem>
+                      <SelectItem value="android">Android</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="testDate">Test Date *</Label>
                   <Input
                     id="testDate"
                     name="testDate"
                     type="date"
                     value={testDate}
-                    onChange={(e) => {
-                      handleFieldInteraction()
-                      setTestDate(e.target.value)
-                    }}
+                    readOnly
                     required
                   />
                 </div>
@@ -526,10 +557,7 @@ export default function Page() {
                     id="applicationVersion"
                     name="applicationVersion"
                     value={applicationVersion}
-                    onChange={(e) => {
-                      handleFieldInteraction()
-                      setApplicationVersion(e.target.value)
-                    }}
+                    readOnly
                     placeholder="v1.0.0"
                     required
                   />

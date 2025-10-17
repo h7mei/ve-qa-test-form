@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { submitInternalTestingCase, type InternalTestingCase } from "@/lib/supabase"
 import Swal from 'sweetalert2'
+import confetti from 'canvas-confetti'
 
 interface SectionData {
   textFeedback: string
@@ -187,6 +188,13 @@ export default function InternalTestingCasePage() {
       const result = await submitInternalTestingCase(testCase)
       
       if (result.success) {
+        // Trigger confetti celebration
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        })
+        
         // Show success alert with SweetAlert2
         await Swal.fire({
           title: 'Success!',
